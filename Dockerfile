@@ -52,15 +52,21 @@ WORKDIR /searxng
 COPY --from=builder /searxng /searxng
 
 # Create persistent data directory
-RUN mkdir -p /etc/searxng
+RUN mkdir -p /etc/searxng \
+    && mkdir -p /var/run/uwsgi-logrotate
 
 # Add start script
 COPY ./start.sh /searxng/start.sh
+# Add Searxng settings
+COPY ./settings.yml /etc/searxng/settings.yml
+COPY ./uwsgi.ini /etc/searxng/uwsgi.ini
 
 # Add an unprivileged user and set directory permissions
 RUN adduser --disabled-password --gecos "" --no-create-home searxng \
     && chown -R searxng:searxng /searxng \
-    && chown -R searxng:searxng /etc/searxng
+    && chown -R searxng:searxng /etc/searxng \
+    && chown -R searxng:searxng /var/log/uwsgi \
+    && chown -R searxng:searxng /var/run/uwsgi-logrotate
 
 ENTRYPOINT ["/sbin/tini", "--"]
 
