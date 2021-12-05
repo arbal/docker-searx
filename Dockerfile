@@ -28,9 +28,6 @@ FROM alpine:3.15
 
 ENV INSTANCE_NAME=Silkky.Cloud \
     AUTOCOMPLETE=duckduckgo \
-    BASE_URL= \
-    MORTY_KEY= \
-    MORTY_URL= \
     SEARXNG_SETTINGS_PATH=/etc/searxng/settings.yml \
     UWSGI_SETTINGS_PATH=/etc/searxng/uwsgi.ini    
 
