@@ -6,7 +6,7 @@ export DEFAULT_BIND_ADDRESS="0.0.0.0:8080"
 export BIND_ADDRESS="${BIND_ADDRESS:-${DEFAULT_BIND_ADDRESS}}"
 
 # Compress static files
-find /usr/local/searxng/searx/static -a \( -name '*.html' -o -name '*.css' -o -name '*.js' -o -name '*.svg' -o -name '*.ttf' -o -name '*.eot' \) -type f -exec gzip -9 -k {} \+ -exec brotli --best {} \+
+find /searxng/searx/static -a \( -name '*.html' -o -name '*.css' -o -name '*.js' -o -name '*.svg' -o -name '*.ttf' -o -name '*.eot' \) -type f -exec gzip -9 -k {} \+ -exec brotli --best {} \+
 
 # Add Environment variables to config
 sed -e "s@baseurlvar@$BASE_URL@g" /etc/searxng/settings.yml
