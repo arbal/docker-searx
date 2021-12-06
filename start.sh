@@ -6,9 +6,15 @@ set -euo pipefail
 export BASE_URL="${BASE_URL%/}/"
 
 # Add environement variables
-sed -i "s@env_base_url@$BASE_URL@g" /etc/searxng/settings.yml
-sed -i "s@env_secret_key@$SECRET_KEY@g" /etc/searxng/settings.yml
-sed -i "s@env_morty_key@$MORTY_KEY@g" /etc/searxng/settings.yml
+if [ ! -z "${BASE_URL}" ]; then
+    sed -i "s@env_base_url@$BASE_URL@g" /etc/searxng/settings.yml
+fi
+if [ ! -z "${SECRET_KEY}" ]; then
+    sed -i "s@env_secret_key@$SECRET_KEY@g" /etc/searxng/settings.yml
+fi
+if [ ! -z "${MORTY_KEY}" ]; then
+    sed -i "s@env_morty_key@$MORTY_KEY@g" /etc/searxng/settings.yml
+fi
 
 # Start SearXNG
 exec python3 /searxng/searx/webapp.py
