@@ -11,9 +11,15 @@ if [ ! -z "${BASE_URL}" ]; then
 fi
 if [ ! -z "${SECRET_KEY}" ]; then
     sed -i "s@env_secret_key@$SECRET_KEY@g" /etc/searxng/settings.yml
+else
+    echo "You need to add the SECRET_KEY environment variable!"
+    exit 1
 fi
 if [ ! -z "${MORTY_KEY}" ]; then
     sed -i "s@env_morty_key@$MORTY_KEY@g" /etc/searxng/settings.yml
+else
+    echo "You need to add the MORTY_KEY environment variable!"
+    exit 1
 fi
 
 # Start SearXNG
