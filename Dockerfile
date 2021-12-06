@@ -1,70 +1,56 @@
 ####################################################################################################
-## Builder
+## Final image
 ####################################################################################################
-FROM python:3.10-alpine3.15 AS builder
+FROM python:3.10.0-alpine3.15
 
-RUN apk add --no-cache \
-    build-base \
-    libffi-dev \
-    libxslt-dev \
-    libxml2-dev \
-    openssl-dev \
-    tar \
-    git
+ENV SEARXNG_SETTINGS_PATH=/etc/searxng/settings.yml
+
+RUN \
+    # Add build dependencies
+    apk add --no-cache -t build-dependencies \
+        build-base \
+        libffi-dev \
+        libxslt-dev \
+        libxml2 \
+        openssl-dev \
+        tar \
+        git \
+    # Add runtime dependencies
+    && apk add --no-cache \
+        ca-certificates \
+        libxml2 \
+        libxslt \
+        openssl \
+        tini \
+        brotli \
+        bash
 
 WORKDIR /searxng
 
 ADD https://github.com/searxng/searxng/archive/master.tar.gz /tmp/searxng-master.tar.gz
 RUN tar xvfz /tmp/searxng-master.tar.gz -C /tmp \
-    && cp -r /tmp/searxng-master/. /searxng
+    && cp -r /tmp/searxng-master/requirements.txt /searxng/requirements.txt
 
+# Install dependencies
 RUN pip3 install --upgrade pip wheel setuptools \
-    && pip3 install --no-cache --no-binary :all: -r requirements.txt
+    && pip3 install --no-cache --no-binary :all: -r requirements.txt \
+    && apk del build-dependencies
 
-####################################################################################################
-## Final image
-####################################################################################################
-FROM alpine:3.15
+# Copy full source code
+RUN cp -r /tmp/searxng-master/. /searxng \
+    # Compress static files
+    && find /searxng/searx/static -a \( -name '*.html' -o -name '*.css' -o -name '*.js' \
+    -o -name '*.svg' -o -name '*.ttf' -o -name '*.eot' \) \
+    -type f -exec gzip -9 -k {} \+ -exec brotli --best {} \+
 
-ENV INSTANCE_NAME=Silkky.Cloud \
-    AUTOCOMPLETE=duckduckgo \
-    SEARXNG_SETTINGS_PATH=/etc/searxng/settings.yml \
-    UWSGI_SETTINGS_PATH=/etc/searxng/uwsgi.ini    
-
-RUN apk add --no-cache \
-    ca-certificates \
-    python3 \
-    py3-pip \
-    libxml2 \
-    libxslt \
-    openssl \
-    tini \
-    uwsgi \
-    uwsgi-python3 \
-    brotli \
-    bash
-
-WORKDIR /searxng
-
-COPY --from=builder /searxng /searxng
-
-# Create persistent data directory
-RUN mkdir -p /etc/searxng \
-    && mkdir -p /var/run/uwsgi-logrotate
-
-# Add start script
+COPY ./settings.yml /etc/searxng/settings.yml
 COPY ./start.sh /searxng/start.sh
 RUN chmod +x /searxng/start.sh
-# Add Searxng settings
-COPY ./settings.yml /etc/searxng/settings.yml
-COPY ./uwsgi.ini /etc/searxng/uwsgi.ini
 
 # Add an unprivileged user and set directory permissions
 RUN adduser --disabled-password --gecos "" --no-create-home searxng \
     && chown -R searxng:searxng /searxng \
-    && chown -R searxng:searxng /etc/searxng \
-    && chown -R searxng:searxng /var/log/uwsgi \
-    && chown -R searxng:searxng /var/run/uwsgi-logrotate
+    && chown -R searxng:searxng /etc/searxng
 
 ENTRYPOINT ["/sbin/tini", "--"]
 

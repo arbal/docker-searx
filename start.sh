@@ -1,21 +1,14 @@
 #!/bin/bash
 
-set -euo pipefail
+set -euo pipedfail
 
-export DEFAULT_BIND_ADDRESS="0.0.0.0:8080"
-export BIND_ADDRESS="${BIND_ADDRESS:-${DEFAULT_BIND_ADDRESS}}"
+# Make sure that there is a trailing slash at end of BASE_URL
+export BASE_URL="${BASE_URL%/}/"
 
-# Compress static files
-find /searxng/searx/static -a \( -name '*.html' -o -name '*.css' -o -name '*.js' -o -name '*.svg' -o -name '*.ttf' -o -name '*.eot' \) -type f -exec gzip -9 -k {} \+ -exec brotli --best {} \+
+# Add environement variables
+sed -i "s@env_base_url@$BASE_URL@g" /etc/searxng/settings.yml
+sed -i "s@env_secret_key@$SECRET_KEY@g" /etc/searxng/settings.yml
+sed -i "s@env_morty_key@$MORTY_KEY@g" /etc/searxng/settings.yml
 
-# Add Environment variables to config
-sed -e "s@baseurlvar@$BASE_URL@g" /etc/searxng/settings.yml
-sed -e "s@secretkeyvar@$SECRET_KEY@g" /etc/searxng/settings.yml
-sed -e "s@mortyproxykeyvar@$MORTY_KEY@g" /etc/searxng/settings.yml
-
-echo "Starting Searx..."
-sleep 3s
-
-# Start Searx
-exec uwsgi --master --http-socket "${BIND_ADDRESS}" "${UWSGI_SETTINGS_PATH}"
-exec /usr/bin/python3 -m compileall -q searx
+# Start SearXNG
+exec python3 searx/webapp.py

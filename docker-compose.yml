@@ -3,7 +3,7 @@ version: '3.8'
 services:
 
   server:
-    image: ghcr.io/silkkycloud/searx:latest
+    image: ghcr.io/silkkycloud/searxng:latest
     hostname: searx
     networks:
       - backend
