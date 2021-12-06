@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+
+  server:
+    image: ghcr.io/silkkycloud/searx:latest
+    hostname: searx
+    networks:
+      - backend
+    deploy:
+      mode: replicated
+      replicas: 3
+      placement:
+        max_replicas_per_node: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2G
+        reservations:
+          cpus: '0.1'
+          memory: 100M
+    environment:
+      - BASE_URL=https://${HOSTNAME}/
+      - SECRET_KEY=${SECRET_KEY}
+      - MORTY_KEY=${MORTY_KEY}
+
+  filtron:
+    image: ghcr.io/silkkycloud/filtron:latest
+    command: -listen 0.0.0.0:4040 -api 0.0.0.0:4041 -target searx:8080
+    read_only: true
+    cap_drop:
+      - ALL
+    hostname: filtron
+    networks:
+      - public
+      - backend
+    deploy:
+      mode: replicated
+      replicas: 3
+      placement:
+        max_replicas_per_node: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.1'
+          memory: 50M
+
+  morty:
+    image: ghcr.io/silkkycloud/morty:latest
+    command: -timeout 6
+    read_only: true
+    cap_drop:
+      - ALL
+    hostname: morty
+    networks:
+      - public
+      - backend
+    deploy:
+      mode: replicated
+      replicas: 3
+      placement:
+        max_replicas_per_node: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.1'
+          memory: 50M
+    environment:
+      - MORTY_KEY=${MORTY_KEY}
+      - MORTY_ADDRESS=0.0.0.0:3000
+
+networks:
+  public:
+    external: true
+
+  backend:
+    driver: overlay
+    internal: true
+    driver_opts:
+      encrypted: "true"
+      com.docker.network.driver.mtu: 1450
