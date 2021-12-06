@@ -11,4 +11,4 @@ sed -i "s@env_secret_key@$SECRET_KEY@g" /etc/searxng/settings.yml
 sed -i "s@env_morty_key@$MORTY_KEY@g" /etc/searxng/settings.yml
 
 # Start SearXNG
-exec python3 searx/webapp.py
+exec python3 /searxng/searx/webapp.py
