@@ -37,7 +37,10 @@ RUN pip3 install --upgrade pip wheel setuptools \
     && apk del build-dependencies
 
 # Copy full source code
-RUN cp -r /tmp/searxng-master/. /searxng \
+RUN cp -r /tmp/searxng-master/. /searxng
+
+# Build SearXNG
+RUN /usr/bin/python3 -m compileall -q searx \
     # Compress static files
     && find /searxng/searx/static -a \( -name '*.html' -o -name '*.css' -o -name '*.js' \
     -o -name '*.svg' -o -name '*.ttf' -o -name '*.eot' \) \
