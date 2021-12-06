@@ -22,9 +22,7 @@ RUN go build .
 ####################################################################################################
 FROM alpine:3.15
 
-RUN apk add --no-cache \
-    ca-certificates \
-    tini
+RUN apk add --no-cache ca-certificates
 
 WORKDIR /morty
 
@@ -34,11 +32,9 @@ COPY --from=builder /morty/morty /morty/morty
 RUN adduser --disabled-password --gecos "" --no-create-home morty \
     && chown -R morty:morty /morty
 
-ENTRYPOINT ["/sbin/tini", "--"]
-
 USER morty
 
-CMD ["/morty/morty", "-timeout 6"]
+ENTRYPOINT ["/morty/morty"]
 
 EXPOSE 3000
 

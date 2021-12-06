@@ -24,9 +24,7 @@ RUN go get -d -v \
 ####################################################################################################
 FROM alpine:3.15
 
-RUN apk add --no-cache \
-    ca-certificates \
-    tini
+RUN apk add --no-cache ca-certificates
 
 WORKDIR /filtron
 
@@ -38,11 +36,9 @@ COPY ./rules.json /filtron/rules.json
 RUN adduser --disabled-password --gecos "" --no-create-home filtron \
     && chown -R filtron:filtron /filtron
 
-ENTRYPOINT ["/sbin/tini", "--"]
-
 USER filtron
 
-CMD ["/filtron/filtron", "--rules", "/filtron/rules.json", "-listen 0.0.0.0:4040", "-api 0.0.0.0:4041", "-target searx:8080"]
+ENTRYPOINT ["/filtron/filtron", "--rules", "/filtron/rules.json"]
 
 EXPOSE 3000
 
