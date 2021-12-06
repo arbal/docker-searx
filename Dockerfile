@@ -54,6 +54,7 @@ RUN mkdir -p /etc/searxng \
 
 # Add start script
 COPY ./start.sh /searxng/start.sh
+RUN chmod +x /searxng/start.sh
 # Add Searxng settings
 COPY ./settings.yml /etc/searxng/settings.yml
 COPY ./uwsgi.ini /etc/searxng/uwsgi.ini

@@ -42,7 +42,7 @@ ENTRYPOINT ["/sbin/tini", "--"]
 
 USER filtron
 
-CMD ["/filtron/filtron", "--rules", "/filtron/rules.json"]
+CMD ["/filtron/filtron", "--rules", "/filtron/rules.json", "-listen 0.0.0.0:4040", "-api 0.0.0.0:4041", "-target searx:8080"]
 
 EXPOSE 3000
 

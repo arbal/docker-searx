@@ -26,7 +26,6 @@ services:
 
   filtron:
     image: ghcr.io/silkkycloud/filtron:latest
-    command: -listen 0.0.0.0:4040 -api 0.0.0.0:4041 -target searx:8080
     read_only: true
     cap_drop:
       - ALL
@@ -49,7 +48,6 @@ services:
 
   morty:
     image: ghcr.io/silkkycloud/morty:latest
-    command: -timeout 6
     read_only: true
     cap_drop:
       - ALL
