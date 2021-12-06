@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -euo pipedfail
+set -euo pipefail
 
 # Make sure that there is a trailing slash at end of BASE_URL
 export BASE_URL="${BASE_URL%/}/"
