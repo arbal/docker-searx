@@ -3,7 +3,14 @@ version: '3.8'
 services:
 
   server:
-    image: ghcr.io/silkkycloud/searxng:latest
+    image: searxng/searxng:latest
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+      - DAC_OVERRIDE
     hostname: searx
     networks:
       - backend
@@ -21,10 +28,8 @@ services:
           memory: 100M
     environment:
       - BASE_URL=https://${HOSTNAME}/
-      - SECRET_KEY=${SECRET_KEY}
+      - MORTY_URL=https://${HOSTNAME}/morty/
       - MORTY_KEY=${MORTY_KEY}
-      - INSTANCE_NAME=Silkky.Cloud
-      - CONTACT_URL=https://www.silkky.cloud/contact
 
   filtron:
     image: ghcr.io/silkkycloud/filtron:latest
