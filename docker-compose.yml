@@ -18,7 +18,10 @@ services:
       mode: replicated
       replicas: 3
       placement:
-        max_replicas_per_node: 1
+        constraints:
+          - "node.hostname == main-3"
+      update_config:
+        failure_action: rollback
       resources:
         limits:
           cpus: '1'
@@ -26,6 +29,8 @@ services:
         reservations:
           cpus: '0.1'
           memory: 100M
+    volumes:
+      - data:/etc/searxng
     environment:
       - BASE_URL=https://${HOSTNAME}/
       - MORTY_URL=https://${HOSTNAME}/morty/
@@ -90,3 +95,6 @@ networks:
     driver_opts:
       encrypted: "true"
       com.docker.network.driver.mtu: 1450
+
+volumes:
+  data:
