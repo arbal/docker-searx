@@ -41,8 +41,8 @@ ui:
   default_theme: simple
   default_locale: ""
   theme_args:
+    oscar_style: logicodev
     simple_style: dark
-  results_on_new_tab: true
 
 result_proxy:
   url: "env_base_urlmorty"
@@ -51,18 +51,18 @@ result_proxy:
 
 # communication with search engines
 #
-# outgoing:
-#   # default timeout in seconds, can be override by engine
-#   request_timeout: 3.0
-#   useragent_suffix: ""
-#   pool_connections: 100
-#   pool_maxsize: 20
-#   enable_http2: true
-#   proxies:
-#     all://:
-#       - http://10.0.2.1:8080
-#       - http://10.0.2.2:8080
-#       - http://10.0.2.3:8080
+outgoing:
+  # default timeout in seconds, can be override by engine
+  request_timeout: 3.0
+  useragent_suffix: ""
+  pool_connections: 100
+  pool_maxsize: 20
+  enable_http2: true
+  # proxies:
+  #   all://:
+  #     - http://10.0.2.1:8080
+  #     - http://10.0.2.2:8080
+  #     - http://10.0.2.3:8080
 
 checker:
   off_when_debug: true
