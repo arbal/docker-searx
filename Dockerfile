@@ -1,33 +1,43 @@
 ####################################################################################################
 ## Final image
 ####################################################################################################
-FROM python:3.10.0-alpine3.15
+FROM alpine:3.15
 
-ENV SEARXNG_SETTINGS_PATH=/etc/searxng/settings.yml \
-    UWSGI_SETTINGS_PATH=/etc/searxng/uwsgi.ini \
-    BIND_ADDRESS=0.0.0.0:8080
+ARG TIMESTAMP_SETTINGS=0
+ARG TIMESTAMP_UWSGI=0
+ARG VERSION_GITCOMMIT=unknown
+
+ENV INSTANCE_NAME=searxng \
+    AUTOCOMPLETE= \
+    BASE_URL= \
+    MORTY_KEY= \
+    MORTY_URL= \
+    SEARXNG_SETTINGS_PATH=/etc/searxng/settings.yml \
+    UWSGI_SETTINGS_PATH=/etc/searxng/uwsgi.ini
 
 RUN \
-    # Add build dependencies
-    apk add --no-cache -t build-dependencies \
+    && apk add --no-cache -t build-dependencies \
         build-base \
+        py3-setuptools \
+        python3-dev \
         libffi-dev \
         libxslt-dev \
-        libxml2 \
+        libxml2-dev \
         openssl-dev \
         tar \
         git \
-    # Add runtime dependencies
     && apk add --no-cache \
         ca-certificates \
+        su-exec \
+        python3 \
+        py3-pip \
         libxml2 \
         libxslt \
         openssl \
         tini \
         uwsgi \
         uwsgi-python3 \
-        brotli \
-        bash
+        brotli
 
 WORKDIR /usr/local/searxng
 
@@ -35,49 +45,35 @@ ADD https://github.com/searxng/searxng/archive/master.tar.gz /tmp/searxng-master
 RUN tar xvfz /tmp/searxng-master.tar.gz -C /tmp \
     && cp -r /tmp/searxng-master/requirements.txt /usr/local/searxng/requirements.txt
 
-# Install dependencies
 RUN pip3 install --upgrade pip wheel setuptools \
-    && pip3 install --no-cache --no-binary :all: -r requirements.txt \
-    && apk del build-dependencies
+    && pip3 install --no-cache  --no-binary :all: -r requirements.txt \
+    && apk del build-dependencies \
+    && rm -rf /root/.cache
 
 # Copy full source code
 RUN cp -r /tmp/searxng-master/. /usr/local/searxng
 
-# Build SearXNG
-RUN python3 -m compileall -q searx \
-    # Compress static files
-    && find /usr/local/searxng/searx/static -a \( -name '*.html' -o -name '*.css' -o -name '*.js' \
-    -o -name '*.svg' -o -name '*.ttf' -o -name '*.eot' \) \
-    -type f -exec gzip -9 -k {} \+ -exec brotli --best {} \+
-
+# Copy configuration files
 COPY ./settings.yml /etc/searxng/settings.yml
-COPY ./start.sh /usr/local/searxng/start.sh
-RUN chmod +x /usr/local/searxng/start.sh
-
-RUN touch /var/run/uwsgi-logrotate
+RUN cp -r /usr/local/searxng/dockerfiles/uwsgi.ini /etc/searxng/uwsgi.ini
 
 # Add an unprivileged user and set directory permissions
 RUN adduser --disabled-password --gecos "" --no-create-home searxng \
     && chown -R searxng:searxng /usr/local/searxng \
-    && chown -R searxng:searxng /etc/searxng \
-    && chown -R searxng:searxng /var/log/uwsgi \
-    && chown -R searxng:searxng /var/run/uwsgi-logrotate
+    && chown -R searxng:searxng /etc/searxng
 
-ENTRYPOINT ["/sbin/tini", "--"]
+RUN su searxng -c "/usr/bin/python3 -m compileall -q searx"; \
+    touch -c --date=@${TIMESTAMP_SETTINGS} searx/settings.yml; \
+    touch -c --date=@${TIMESTAMP_UWSGI} dockerfiles/uwsgi.ini; \
+    find /usr/local/searxng/searx/static -a \( -name '*.html' -o -name '*.css' -o -name '*.js' \
+    -o -name '*.svg' -o -name '*.ttf' -o -name '*.eot' \) \
+    -type f -exec gzip -9 -k {} \+ -exec brotli --best {} \+
 
-USER searxng
-
-CMD ["./start.sh"]
+ENTRYPOINT ["/sbin/tini","--","/usr/local/searxng/dockerfiles/docker-entrypoint.sh"]
 
 EXPOSE 8080
 
 STOPSIGNAL SIGTERM
-
-HEALTHCHECK \
-    --start-period=30s \
-    --interval=1m \
-    --timeout=5s \
-    CMD wget --spider --q http://localhost:8080/ || exit 1
 
 # Image metadata
 LABEL org.opencontainers.image.title=SearXNG
