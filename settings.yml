@@ -35,21 +35,17 @@ server:
     Referrer-Policy: no-referrer
 
 ui:
-  # Custom static path - leave it blank if you didn't change
   static_path: ""
-  # Custom templates path - leave it blank if you didn't change
   templates_path: ""
   query_in_title: false
-  # ui theme
   default_theme: simple
   default_locale: ""
   theme_args:
-    # style of simple theme: auto, light, dark
     simple_style: dark
     results_on_new_tab: true
 
 result_proxy:
-  url: http://morty:3000/
+  url: "env_base_url/morty"
   key: !!binary "env_morty_key"
   proxify_results: true
 
