@@ -51,8 +51,8 @@ RUN python3 -m compileall -q searx \
     -type f -exec gzip -9 -k {} \+ -exec brotli --best {} \+
 
 COPY ./settings.yml /etc/searxng/settings.yml
-COPY ./start.sh /searxng/start.sh
-RUN chmod +x /searxng/start.sh
+COPY ./start.sh /usr/local/searxng/start.sh
+RUN chmod +x /usr/local/searxng/start.sh
 
 RUN touch /var/run/uwsgi-logrotate
 
