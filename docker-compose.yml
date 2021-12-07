@@ -17,9 +17,6 @@ services:
     deploy:
       mode: replicated
       replicas: 3
-      placement:
-        constraints:
-          - "node.hostname == main-3"
       update_config:
         failure_action: rollback
       resources:
@@ -29,8 +26,9 @@ services:
         reservations:
           cpus: '0.1'
           memory: 100M
-    volumes:
-      - data:/etc/searxng
+    configs:
+      - source: searxng_config
+        target: /etc/searxng/settings.yml
     environment:
       - BASE_URL=https://${HOSTNAME}/
       - MORTY_URL=https://${HOSTNAME}/morty/
@@ -96,5 +94,6 @@ networks:
       encrypted: "true"
       com.docker.network.driver.mtu: 1450
 
-volumes:
-  data:
+configs:
+  searxng_config:
+    file: ./settings.yml
