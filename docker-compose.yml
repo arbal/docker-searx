@@ -4,6 +4,7 @@ services:
 
   server:
     image: searxng/searxng:latest
+    command: -f
     cap_drop:
       - ALL
     cap_add:

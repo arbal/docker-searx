@@ -1,4 +1,3 @@
-
 [
     {
         "name": "searx.space",
@@ -119,7 +118,7 @@
                 "aggregations": ["Header:X-Forwarded-For"],
                 "actions": [
                     {"name": "block",
-		     "params": {"message": "Rate limit exceeded, try again later."}}
+		             "params": {"message": "Rate limit exceeded, try again later."}}
                 ]
             },
             {
@@ -141,7 +140,7 @@
                 "actions": [
                     {"name": "block",
                      "params": {"message": "Rate limit exceeded, try again later."}}
-		]
+		        ]
             }
         ]
     }
