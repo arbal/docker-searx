@@ -42,10 +42,10 @@ ui:
   default_locale: ""
   theme_args:
     simple_style: dark
-    results_on_new_tab: true
+  results_on_new_tab: true
 
 result_proxy:
-  url: "env_base_url/morty"
+  url: "env_base_urlmorty"
   key: !!binary "env_morty_key"
   proxify_results: true
 
