@@ -1,3 +1,3 @@
 # Searx
 
-Searx Docker Swarm deployment and image.
+Searx Docker Swarm deployment and images.
