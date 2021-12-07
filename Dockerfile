@@ -16,7 +16,7 @@ ENV INSTANCE_NAME=searxng \
     UWSGI_SETTINGS_PATH=/etc/searxng/uwsgi.ini
 
 RUN \
-    && apk add --no-cache -t build-dependencies \
+    apk add --no-cache -t build-dependencies \
         build-base \
         py3-setuptools \
         python3-dev \
