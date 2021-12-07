@@ -3,7 +3,9 @@
 ####################################################################################################
 FROM python:3.10.0-alpine3.15
 
-ENV SEARXNG_SETTINGS_PATH=/etc/searxng/settings.yml
+ENV SEARXNG_SETTINGS_PATH=/etc/searxng/settings.yml \
+    UWSGI_SETTINGS_PATH=/etc/searxng/uwsgi.ini \
+    BIND_ADDRESS=0.0.0.0:8080
 
 RUN \
     # Add build dependencies
@@ -22,14 +24,16 @@ RUN \
         libxslt \
         openssl \
         tini \
+        uwsgi \
+        uwsgi-python3 \
         brotli \
         bash
 
-WORKDIR /searxng
+WORKDIR /usr/local/searxng
 
 ADD https://github.com/searxng/searxng/archive/master.tar.gz /tmp/searxng-master.tar.gz
 RUN tar xvfz /tmp/searxng-master.tar.gz -C /tmp \
-    && cp -r /tmp/searxng-master/requirements.txt /searxng/requirements.txt
+    && cp -r /tmp/searxng-master/requirements.txt /usr/local/searxng/requirements.txt
 
 # Install dependencies
 RUN pip3 install --upgrade pip wheel setuptools \
@@ -37,12 +41,12 @@ RUN pip3 install --upgrade pip wheel setuptools \
     && apk del build-dependencies
 
 # Copy full source code
-RUN cp -r /tmp/searxng-master/. /searxng
+RUN cp -r /tmp/searxng-master/. /usr/local/searxng
 
 # Build SearXNG
 RUN python3 -m compileall -q searx \
     # Compress static files
-    && find /searxng/searx/static -a \( -name '*.html' -o -name '*.css' -o -name '*.js' \
+    && find /usr/local/searxng/searx/static -a \( -name '*.html' -o -name '*.css' -o -name '*.js' \
     -o -name '*.svg' -o -name '*.ttf' -o -name '*.eot' \) \
     -type f -exec gzip -9 -k {} \+ -exec brotli --best {} \+
 
@@ -50,10 +54,14 @@ COPY ./settings.yml /etc/searxng/settings.yml
 COPY ./start.sh /searxng/start.sh
 RUN chmod +x /searxng/start.sh
 
+RUN touch /var/run/uwsgi-logrotate
+
 # Add an unprivileged user and set directory permissions
 RUN adduser --disabled-password --gecos "" --no-create-home searxng \
-    && chown -R searxng:searxng /searxng \
-    && chown -R searxng:searxng /etc/searxng
+    && chown -R searxng:searxng /usr/local/searxng \
+    && chown -R searxng:searxng /etc/searxng \
+    && chown -R searxng:searxng /var/log/uwsgi \
+    && chown -R searxng:searxng /var/run/uwsgi-logrotate
 
 ENTRYPOINT ["/sbin/tini", "--"]
 

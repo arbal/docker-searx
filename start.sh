@@ -8,6 +8,9 @@ export BASE_URL="${BASE_URL%/}/"
 # Add environement variables
 if [ ! -z "${BASE_URL}" ]; then
     sed -i "s@env_base_url@$BASE_URL@g" /etc/searxng/settings.yml
+else
+    echo "You need to add the BASE_URL environment variable!"
+    exit 1
 fi
 if [ ! -z "${SECRET_KEY}" ]; then
     sed -i "s@env_secret_key@$SECRET_KEY@g" /etc/searxng/settings.yml
@@ -22,5 +25,11 @@ else
     exit 1
 fi
 
+# Copy latest uwsgi configuration
+cp -r /usr/local/searxng/dockerfiles/uwsgi.ini /etc/searxng/uwsgi.ini
+
 # Start SearXNG
-exec python3 /searxng/searx/webapp.py
+printf 'Starting SearXNG... %s\n' "${BASE_URL}"
+sleep 3s
+printf 'Listen on %s\n' "${BIND_ADDRESS}"
+exec uwsgi --master --http-socket "${BIND_ADDRESS}" "${UWSGI_SETTINGS_PATH}"
