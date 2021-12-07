@@ -47,8 +47,8 @@ EXPOSE 3000
 STOPSIGNAL SIGTERM
 
 HEALTHCHECK \
-    --start-period=1m \
-    --interval=2m \
+    --start-period=30s \
+    --interval=1m \
     --timeout=5s \
     CMD wget --spider --q http://localhost:4040/ || exit 1
 
