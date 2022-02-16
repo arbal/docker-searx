@@ -10,12 +10,14 @@ RUN apk add --no-cache \
 
 WORKDIR /morty
 
-ADD https://github.com/asciimoo/morty/archive/master.tar.gz /tmp/morty-master.tar.gz
+ADD https://github.com/dalf/morty/archive/master.tar.gz /tmp/morty-master.tar.gz
 RUN tar xvfz /tmp/morty-master.tar.gz -C /tmp \
     && cp -r /tmp/morty-master/. /morty
 
 # Build Morty
-RUN go build .
+RUN go get -d -v \
+    && gofmt -l ./ \
+    && CGO_ENABLED=0 go build -ldflags '-extldflags "-static"' -tags timetzdata .
 
 ####################################################################################################
 ## Final image
@@ -34,9 +36,11 @@ COPY --from=builder /morty/morty /morty/morty
 RUN adduser --disabled-password --gecos "" --no-create-home morty \
     && chown -R morty:morty /morty
 
+ENTRYPOINT ["/sbin/tini", "--"]
+
 USER morty
 
-ENTRYPOINT ["/sbin/tini", "--", "/morty/morty"]
+CMD ["/morty/morty"]
 
 EXPOSE 3000
 
