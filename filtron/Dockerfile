@@ -43,9 +43,9 @@ ENTRYPOINT ["/sbin/tini", "--"]
 
 USER filtron
 
-CMD ["/filtron/filtron", "--rules", "/filtron/rules.json"]
+CMD ["/filtron/filtron", "--rules", "/filtron/rules.json", "--listen", "0.0.0.0:4040", "--api", "0.0.0.0:4041"]
 
-EXPOSE 3000
+EXPOSE 4040
 
 STOPSIGNAL SIGTERM
 
@@ -53,7 +53,7 @@ HEALTHCHECK \
     --start-period=30s \
     --interval=1m \
     --timeout=5s \
-    CMD wget --spider --q http://localhost:4040/ || exit 1
+    CMD wget --spider --q http://localhost:4041/rules || exit 1
 
 # Image metadata
 LABEL org.opencontainers.image.title=Filtron
