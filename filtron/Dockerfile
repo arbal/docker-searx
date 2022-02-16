@@ -32,7 +32,7 @@ WORKDIR /filtron
 
 COPY --from=builder /filtron/filtron /filtron/filtron
 
-COPY ./rules.json /filtron/rules.json
+COPY ./filtron/rules.json /filtron/rules.json
 
 # Add an unprivileged user and set directory permissions
 RUN adduser --disabled-password --gecos "" --no-create-home filtron \
