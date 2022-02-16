@@ -5,19 +5,21 @@ FROM golang:1.17-alpine AS builder
 
 RUN apk add --no-cache \
     ca-certificates \
-    git \
+    wget \
     tar
 
 WORKDIR /filtron
 
-ADD https://github.com/dalf/filtron/archive/master.tar.gz /tmp/filtron-master.tar.gz
+ADD https://github.com/searxng/filtron/archive/master.tar.gz /tmp/filtron-master.tar.gz
 RUN tar xvfz /tmp/filtron-master.tar.gz -C /tmp \
     && cp -r /tmp/filtron-master/. /filtron
 
 # Build Filtron
 RUN go get -d -v \
     && gofmt -l ./ \
-    && go build .
+    && CGO_ENABLED=0 go build -ldflags '-extldflags "-static"' -tags timetzdata .
+
+RUN wget -O /filtron/rules.json https://raw.githubusercontent.com/searxng/searxng-docker/master/rules.json
 
 ####################################################################################################
 ## Final image
@@ -31,16 +33,17 @@ RUN apk add --no-cache \
 WORKDIR /filtron
 
 COPY --from=builder /filtron/filtron /filtron/filtron
-
-COPY ./filtron/rules.json /filtron/rules.json
+COPY --from=builder /filtron/rules.json /filtron/rules.json
 
 # Add an unprivileged user and set directory permissions
 RUN adduser --disabled-password --gecos "" --no-create-home filtron \
     && chown -R filtron:filtron /filtron
 
+ENTRYPOINT ["/sbin/tini", "--"]
+
 USER filtron
 
-ENTRYPOINT ["/sbin/tini", "--", "/filtron/filtron", "--rules", "/filtron/rules.json"]
+CMD ["/filtron/filtron", "--rules", "/filtron/rules.json"]
 
 EXPOSE 3000
 
