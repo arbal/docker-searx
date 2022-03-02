@@ -1,6 +1,6 @@
 general:
   debug: false
-  instance_name: "SearXNG"
+  instance_name: "SearX Silkky.Cloud"
   contact_url: "https://www.silkky.cloud/contact"
   enable_metrics: false
 
