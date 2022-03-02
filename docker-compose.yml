@@ -61,7 +61,7 @@ services:
       labels:
         - "traefik.enable=true"
         # Filtron Router
-        - "traefik.http.routers.filtron.srule=Host(`${HOSTNAME}`)"
+        - "traefik.http.routers.filtron.rule=Host(`${HOSTNAME}`)"
         - "traefik.http.routers.filtron.entrypoints=websecure"
         - "traefik.http.routers.filtron.tls=true"
         - "traefik.http.routers.filtron.middlewares=filtron-headers"
