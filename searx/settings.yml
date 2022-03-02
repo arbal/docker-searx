@@ -48,7 +48,6 @@ ui:
   theme_args:
     oscar_style: logicodev
     simple_style: dark
-    results_on_new_tab: true
 
 result_proxy:
   url: https://ENV_HOSTNAME/morty/
