@@ -69,12 +69,6 @@ EXPOSE 8080
 
 STOPSIGNAL SIGTERM
 
-HEALTHCHECK \
-    --start-period=30s \
-    --interval=1m \
-    --timeout=5s \
-    CMD wget --spider --q http://localhost:8080/ || exit 1
-
 # Image metadata
 LABEL org.opencontainers.image.title=SearXNG
 LABEL org.opencontainers.image.description="SearXNG is a free internet metasearch engine which aggregates results from various search services and databases."
