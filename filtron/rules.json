@@ -40,66 +40,6 @@
         "actions": [{"name": "log"}]
       },
       {
-        "name": "robot agent forbidden",
-        "limit": 0,
-        "stop": true,
-        "filters": ["Header:User-Agent=([Cc][Uu][Rr][Ll]|[wW]get|Scrapy|splash|JavaFX|FeedFetcher|python-requests|Go-http-client|Java|Jakarta|okhttp|HttpClient|Jersey|Python|libwww-perl|Ruby|SynHttpClient|UniversalFeedParser)"],
-        "actions": [
-          {"name": "block",
-            "params": {"message": "Rate limit exceeded"}}
-        ]
-      },
-      {
-        "name": "bot forbidden",
-        "limit": 0,
-        "stop": true,
-        "filters": ["Header:User-Agent=(Googlebot|GoogleImageProxy|bingbot|Baiduspider|yacybot|YandexMobileBot|YandexBot|Yahoo! Slurp|MJ12bot|AhrefsBot|archive.org_bot|msnbot|MJ12bot|SeznamBot|linkdexbot|Netvibes|SMTBot|zgrab|James BOT|Sogou|Abonti|Pixray|Spinn3r|SemrushBot|Exabot|ZmEu|BLEXBot|bitlybot)"],
-        "actions": [
-          {"name": "block",
-            "params": {"message": "Rate limit exceeded"}}
-        ]
-      },
-      {
-        "name": "block missing accept-language",
-        "filters": ["!Header:Accept-Language"],
-        "limit": 0,
-        "stop": true,
-        "actions": [
-          {"name": "block",
-            "params": {"message": "Rate limit exceeded"}}
-        ]
-      },
-      {
-        "name": "block Connection:close",
-        "filters": ["Header:Connection=close"],
-        "limit": 0,
-        "stop": true,
-        "actions": [
-          {"name": "block",
-            "params": {"message": "Rate limit exceeded"}}
-        ]
-      },
-      {
-        "name": "block no deflate support",
-        "filters": ["!Header:Accept-Encoding=(^deflate$|^deflate[;,]|[; ]deflate$|[; ]deflate[;,])"],
-        "limit": 0,
-        "stop": true,
-        "actions": [
-          {"name": "block",
-            "params": {"message": "Rate limit exceeded"}}
-        ]
-      },
-      {
-        "name": "block accept everything",
-        "filters": ["!Header:Accept=text/html"],
-        "limit": 0,
-        "stop": true,
-        "actions": [
-          {"name": "block",
-            "params": {"message": "Rate limit exceeded"}}
-        ]
-      },
-      {
         "name": "rss/json limit",
         "interval": 3600,
         "limit": 4,
