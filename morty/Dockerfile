@@ -38,7 +38,7 @@ ENTRYPOINT ["/sbin/tini", "--"]
 
 USER morty
 
-CMD ["/morty/morty", "--timeout 6", "--ipv6"]
+CMD ["/morty/morty", "-timeout 6", "-ipv6"]
 
 EXPOSE 3000
 
