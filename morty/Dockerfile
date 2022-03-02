@@ -34,11 +34,9 @@ COPY --from=builder /morty/morty /morty/morty
 RUN adduser --disabled-password --gecos "" --no-create-home morty \
     && chown -R morty:morty /morty
 
-ENTRYPOINT ["/sbin/tini", "--"]
-
 USER morty
 
-CMD ["/morty/morty", "-timeout 6", "-ipv6"]
+ENTRYPOINT ["/sbin/tini", "--", "/morty/morty"]
 
 EXPOSE 3000
 
