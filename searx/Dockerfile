@@ -3,6 +3,8 @@
 ####################################################################################################
 FROM alpine:3.15
 
+ENV SEARXNG_SETTINGS_PATH="/data/settings.yml"
+
 RUN apk add --no-cache \
     ca-certificates \
     python3 \
