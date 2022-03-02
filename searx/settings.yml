@@ -61,7 +61,7 @@ outgoing:
   enable_http2: true
   proxies:
     all://:
-      - http://:tinyproxy:8080
+      - http://tinyproxy:8080
 
 enabled_plugins:
   - 'Hostname replace'
