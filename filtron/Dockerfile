@@ -18,8 +18,6 @@ RUN go get -d -v \
     && gofmt -l ./ \
     && CGO_ENABLED=0 go build -ldflags '-extldflags "-static"' -tags timetzdata .
 
-RUN wget -O /filtron/rules.json https://raw.githubusercontent.com/searxng/searxng-docker/master/rules.json
-
 ####################################################################################################
 ## Final image
 ####################################################################################################
@@ -32,7 +30,7 @@ RUN apk add --no-cache \
 WORKDIR /filtron
 
 COPY --from=builder /filtron/filtron /filtron/filtron
-COPY --from=builder /filtron/rules.json /filtron/rules.json
+COPY /filtron/rules.json /filtron/rules.json
 
 # Add an unprivileged user and set directory permissions
 RUN adduser --disabled-password --gecos "" --no-create-home filtron \
