@@ -5,14 +5,12 @@ FROM golang:1.17-alpine AS builder
 
 RUN apk add --no-cache \
     ca-certificates \
-    git \
-    tar
+    git
 
 WORKDIR /morty
 
-ADD https://github.com/dalf/morty/archive/master.tar.gz /tmp/morty-master.tar.gz
-RUN tar xvfz /tmp/morty-master.tar.gz -C /tmp \
-    && cp -r /tmp/morty-master/. /morty
+ADD https://api.github.com/repos/dalf/morty/git/refs/head /cachebreak
+RUN git clone https://github.com/dalf/morty.git /morty
 
 # Build Morty
 RUN go get -d -v \

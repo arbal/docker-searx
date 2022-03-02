@@ -6,13 +6,12 @@ FROM golang:1.17-alpine AS builder
 RUN apk add --no-cache \
     ca-certificates \
     wget \
-    tar
+    git
 
 WORKDIR /filtron
 
-ADD https://github.com/searxng/filtron/archive/master.tar.gz /tmp/filtron-master.tar.gz
-RUN tar xvfz /tmp/filtron-master.tar.gz -C /tmp \
-    && cp -r /tmp/filtron-master/. /filtron
+ADD https://api.github.com/repos/searxng/filtron/git/refs/head /cachebreak
+RUN git clone https://github.com/searxng/filtron.git /filtron
 
 # Build Filtron
 RUN go get -d -v \
