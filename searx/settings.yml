@@ -26,7 +26,7 @@ server:
   base_url: "https://ENV_HOSTNAME/"
   limiter: false
   secret_key: "ENV_SECRET_KEY"
-  image_proxy: false
+  image_proxy: true
   http_protocol_version: "1.0"
   method: "POST"
   default_http_headers:
@@ -50,7 +50,7 @@ ui:
     simple_style: dark
 
 result_proxy:
-  url: http://127.0.0.1:3000/
+  url: https://ENV_HOSTNAME/morty/
   key: !!binary "ENV_MORTY_KEY"
 
 outgoing:
@@ -62,16 +62,6 @@ outgoing:
   proxies:
     all://:
       - http://tinyproxy:8080
-
-enabled_plugins:
-  - 'Hostname replace'
-
-hostname_replace:
-  '(.*\.)?youtube\.com$': 'piped.silkky.cloud'
-  '(.*\.)?youtu\.be$': 'piped.silkky.cloud'
-  '(.*\.)?reddit\.com$': 'libreddit.silkky.cloud'
-  '(.*\.)?redd\.it$': 'libreddit.silkky.cloud'
-  '(www\.)?twitter\.com$': 'nitter.silkky.cloud'
 
 checker:
   off_when_debug: true
