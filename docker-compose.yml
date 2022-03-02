@@ -15,7 +15,6 @@ services:
     networks:
       - backend
       - proxy_net
-      - public
     deploy:
       mode: replicated
       replicas: 6
@@ -32,18 +31,6 @@ services:
         reservations:
           cpus: '0.2'
           memory: 1G
-      labels:
-        - "traefik.enable=true"
-        # Filtron Router
-        - "traefik.http.routers.filtron.rule=Host(`${HOSTNAME}`)"
-        - "traefik.http.routers.filtron.entrypoints=websecure"
-        - "traefik.http.routers.filtron.tls=true"
-        - "traefik.http.routers.filtron.middlewares=filtron-headers"
-        - "traefik.http.routers.filtron.service=filtron-service"
-        # Filtron Headers
-        - "traefik.http.middlewares.filtron-headers.headers.contentSecurityPolicy=upgrade-insecure-requests; default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; form-action 'self'; font-src 'self'; frame-ancestors 'self'; base-uri 'self'; connect-src 'self' https://overpass-api.de; img-src 'self' data: https://*.tile.openstreetmap.org; frame-src https://www.youtube-nocookie.com https://player.vimeo.com https://www.dailymotion.com https://www.deezer.com https://www.mixcloud.com https://w.soundcloud.com https://embed.spotify.com"
-        # Service
-        - "traefik.http.services.filtron-service.loadbalancer.server.port=8080"
     environment:
       - HOSTNAME=${HOSTNAME}
       - SECRET_KEY=${SECRET_KEY}
@@ -73,18 +60,18 @@ services:
         reservations:
           cpus: '0.1'
           memory: 100M
-#      labels:
-#        - "traefik.enable=true"
-#        # Filtron Router
-#        - "traefik.http.routers.filtron.rule=Host(`${HOSTNAME}`)"
-#        - "traefik.http.routers.filtron.entrypoints=websecure"
-#        - "traefik.http.routers.filtron.tls=true"
-#        - "traefik.http.routers.filtron.middlewares=filtron-headers"
-#        - "traefik.http.routers.filtron.service=filtron-service"
-#        # Filtron Headers
-#        - "traefik.http.middlewares.filtron-headers.headers.contentSecurityPolicy=upgrade-insecure-requests; default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; form-action 'self'; font-src 'self'; frame-ancestors 'self'; base-uri 'self'; connect-src 'self' https://overpass-api.de; img-src 'self' data: https://*.tile.openstreetmap.org; frame-src https://www.youtube-nocookie.com https://player.vimeo.com https://www.dailymotion.com https://www.deezer.com https://www.mixcloud.com https://w.soundcloud.com https://embed.spotify.com"
-#        # Service
-#        - "traefik.http.services.filtron-service.loadbalancer.server.port=4040"
+      labels:
+        - "traefik.enable=true"
+        # Filtron Router
+        - "traefik.http.routers.filtron.rule=Host(`${HOSTNAME}`)"
+        - "traefik.http.routers.filtron.entrypoints=websecure"
+        - "traefik.http.routers.filtron.tls=true"
+        - "traefik.http.routers.filtron.middlewares=filtron-headers"
+        - "traefik.http.routers.filtron.service=filtron-service"
+        # Filtron Headers
+        - "traefik.http.middlewares.filtron-headers.headers.contentSecurityPolicy=upgrade-insecure-requests; default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; form-action 'self'; font-src 'self'; frame-ancestors 'self'; base-uri 'self'; connect-src 'self' https://overpass-api.de; img-src 'self' data: https://*.tile.openstreetmap.org; frame-src https://www.youtube-nocookie.com https://player.vimeo.com https://www.dailymotion.com https://www.deezer.com https://www.mixcloud.com https://w.soundcloud.com https://embed.spotify.com"
+        # Service
+        - "traefik.http.services.filtron-service.loadbalancer.server.port=4040"
 
   morty:
     image: ghcr.io/silkkycloud/morty:latest
