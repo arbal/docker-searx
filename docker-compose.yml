@@ -72,8 +72,8 @@ services:
         - "traefik.http.routers.searx-api.rule=Host(`${HOSTNAME}`) && PathPrefix(`/config`, `/status`)"
         - "traefik.http.routers.searx-api.entrypoints=websecure"
         - "traefik.http.routers.searx-api.tls=true"
-        - "traefik.http.routers.searx.middlewares=searx-global-headers,searx-api-headers"
-        - "traefik.http.routers.searx.service=filtron-service"
+        - "traefik.http.routers.searx-api.middlewares=searx-global-headers,searx-api-headers"
+        - "traefik.http.routers.searx-api.service=filtron-service"
         # Static Router
         - "traefik.http.routers.searx-static.rule=Host(`${HOSTNAME}`) && PathPrefix(`/static`)"
         - "traefik.http.routers.searx-static.entrypoints=websecure"
