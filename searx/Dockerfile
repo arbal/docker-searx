@@ -4,15 +4,15 @@
 FROM alpine:3.15
 
 RUN apk add --no-cache \
-    ca-certficates \
+    ca-certificates \
     python3 \
     py3-pip \
     libxml2 \
     libxslt \
     openssl \
     tini \
-    uwgi \
-    uwgi-python3 \
+    uwsgi \
+    uwsgi-python3 \
     brotli \
     bash \
     && apk add --no-cache -t build-dependencies \
