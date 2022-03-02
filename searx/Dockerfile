@@ -14,6 +14,7 @@ RUN apk add --no-cache \
     uwgi \
     uwgi-python3 \
     brotli \
+    bash \
     && apk add --no-cache -t build-dependencies \
     build-base \
     py3-setuptools \

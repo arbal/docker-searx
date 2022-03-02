@@ -23,7 +23,7 @@ search:
 server:
   port: 8080
   bind_address: "0.0.0.0"
-  base_url: "https://ENV_HOSTNAME"
+  base_url: "https://ENV_HOSTNAME/"
   limiter: false
   secret_key: "ENV_SECRET_KEY"
   image_proxy: false
