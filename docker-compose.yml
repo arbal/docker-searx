@@ -73,6 +73,7 @@ services:
 
   morty:
     image: ghcr.io/silkkycloud/morty:latest
+    command: -timeout 6 -ipv6
     read_only: true
     cap_drop:
       - ALL
