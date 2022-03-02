@@ -15,6 +15,7 @@ services:
     networks:
       - backend
       - proxy_net
+      - public
     deploy:
       mode: replicated
       replicas: 6
