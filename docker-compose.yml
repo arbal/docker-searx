@@ -3,91 +3,59 @@ version: '3.8'
 services:
 
   server:
-    image: searxng/searxng:latest
-    command: -f
-    cap_drop:
-      - ALL
-    cap_add:
-      - CHOWN
-      - SETGID
-      - SETUID
-      - DAC_OVERRIDE
+    image: ghcr.io/silkkycloud/searxng:latest
     hostname: searx
     networks:
       - backend
+      - proxy_net
     deploy:
       mode: replicated
-      replicas: 3
+      replicas: 6
       placement:
+        max_replicas_per_node: 2
         constraints:
-          - "node.hostname == main-3"
+          - "node.labels.web_server == true"
       update_config:
         failure_action: rollback
       resources:
         limits:
-          cpus: '1'
-          memory: 2G
+          cpus: '4'
+          memory: 8GB
         reservations:
-          cpus: '0.1'
-          memory: 100M
-    volumes:
-      - data:/etc/searxng
+          cpus: '0.2'
+          memory: 1G
     environment:
-      - BASE_URL=https://${HOSTNAME}/
-      - MORTY_URL=https://${HOSTNAME}/morty/
+      - HOSTNAME=${HOSTNAME}
+      - SECRET_KEY=${SECRET_KEY}
       - MORTY_KEY=${MORTY_KEY}
 
   filtron:
-    image: ghcr.io/silkkycloud/filtron:latest
-    command: -listen 0.0.0.0:4040 -api 0.0.0.0:4041 -target searx:8080
-    read_only: true
-    cap_drop:
-      - ALL
-    hostname: filtron
-    networks:
-      - public
-      - backend
-    deploy:
-      mode: replicated
-      replicas: 3
-      placement:
-        max_replicas_per_node: 1
-      resources:
-        limits:
-          cpus: '1'
-          memory: 1G
-        reservations:
-          cpus: '0.1'
-          memory: 50M
 
   morty:
-    image: ghcr.io/silkkycloud/morty:latest
-    command: -timeout 6
-    read_only: true
-    cap_drop:
-      - ALL
-    hostname: morty
+
+  redis:
+    image: redis:6.2.6-alpine
+    hostname: redis
     networks:
-      - public
       - backend
     deploy:
       mode: replicated
-      replicas: 3
+      replicas: 1
       placement:
-        max_replicas_per_node: 1
+        constraints:
+          - "node.labels.web_server == true"
       resources:
         limits:
-          cpus: '1'
-          memory: 1G
+          cpus: '0.5'
+          memory: 512M
         reservations:
           cpus: '0.1'
           memory: 50M
-    environment:
-      - MORTY_KEY=${MORTY_KEY}
-      - MORTY_ADDRESS=0.0.0.0:3000
 
 networks:
   public:
+    external: true
+  proxy_net:
     external: true
 
   backend:
@@ -96,6 +64,3 @@ networks:
     driver_opts:
       encrypted: "true"
       com.docker.network.driver.mtu: 1450
-
-volumes:
-  data:

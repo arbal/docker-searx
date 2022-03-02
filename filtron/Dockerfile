@@ -38,11 +38,9 @@ COPY --from=builder /filtron/rules.json /filtron/rules.json
 RUN adduser --disabled-password --gecos "" --no-create-home filtron \
     && chown -R filtron:filtron /filtron
 
-ENTRYPOINT ["/sbin/tini", "--"]
-
 USER filtron
 
-CMD ["/filtron/filtron", "--rules", "/filtron/rules.json", "--listen", "0.0.0.0:4040", "--api", "0.0.0.0:4041"]
+ENTRYPOINT ["/sbin/tini", "--", "/filtron/filtron", "--rules", "/filtron/rules.json", "--listen", "0.0.0.0:4040", "--api", "0.0.0.0:4041"]
 
 EXPOSE 4040
 
