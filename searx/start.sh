@@ -7,7 +7,7 @@ get_searxng_version() {
 
 SEARXNG_VERSION="$(get_searxng_version)"
 export SEARXNG_VERSION
-echo "SearXNG Version ${SEARXNG_VERSION}"
+echo "SearXNG version ${SEARXNG_VERSION}"
 
 if [[ -v HOSTNAME ]]; then
   sed -i "s@ENV_HOSTNAME@$HOSTNAME@g" /data/settings.yml

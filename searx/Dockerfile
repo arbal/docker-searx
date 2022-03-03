@@ -28,10 +28,10 @@ RUN apk add --no-cache \
     tar \
     git
 
-WORKDIR /searxng
-
 ADD https://api.github.com/repos/searxng/searxng/git/refs/head /cachebreak
 RUN git clone https://github.com/searxng/searxng.git /searxng
+
+WORKDIR /searxng
 
 # Install Python dependencies
 RUN pip3 install --upgrade pip wheel setuptools \
