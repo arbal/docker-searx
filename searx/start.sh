@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 
+get_searxng_version() {
+  python3 -c "import six; import searx.version; six.print_(searx.version.VERSION_STRING)" \
+  2>/dev/null
+}
+
+SEARXNG_VERSION="$(get_searxng_version)"
+export SEARXNG_VERSION
+echo "SearXNG Version ${SEARXNG_VERSION}"
+
 if [[ -v HOSTNAME ]]; then
   sed -i "s@ENV_HOSTNAME@$HOSTNAME@g" /data/settings.yml
 else
