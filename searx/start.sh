@@ -1,11 +1,6 @@
 #!/usr/bin/env bash
 
-get_searxng_version() {
-  python3 -c "import six; import searx.version; six.print_(searx.version.VERSION_STRING)" \
-  2>/dev/null
-}
-
-SEARXNG_VERSION="$(get_searxng_version)"
+SEARXNG_VERSION="$(<VERSION)"
 export SEARXNG_VERSION
 echo "SearXNG version ${SEARXNG_VERSION}"
 

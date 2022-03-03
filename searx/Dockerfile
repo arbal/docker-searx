@@ -33,9 +33,10 @@ RUN git clone https://github.com/searxng/searxng.git /searxng
 
 WORKDIR /searxng
 
-# Install Python dependencies
+# Install Python dependencies and get SearXNG version
 RUN pip3 install --upgrade pip wheel setuptools \
     && pip3 install --no-cache -r requirements.txt \
+    && python3 -c "import six; import searx.version; six.print_(searx.version.VERSION_STRING)" > VERSION \
     && apk del build-dependencies \
     && rm -rf /root/.cache
 
