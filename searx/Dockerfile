@@ -33,6 +33,9 @@ RUN git clone https://github.com/searxng/searxng.git /searxng
 
 WORKDIR /searxng
 
+# Modified limiter.py plugin for Cloudflare use
+COPY ./searx/limiter.py ./searx/plugins/limiter.py
+
 # Install Python dependencies and get SearXNG version
 RUN pip3 install --upgrade pip wheel setuptools \
     && pip3 install --no-cache -r requirements.txt \
