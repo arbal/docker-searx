@@ -11,8 +11,9 @@ services:
       - SETGID
       - SETUID
       - DAC_OVERRIDE
-    hostname: searx
+    hostname: searxng
     networks:
+      - public
       - backend
       - proxy_net
     deploy:
@@ -27,113 +28,58 @@ services:
       resources:
         limits:
           cpus: '4'
-          memory: 8GB
+          memory: 6GB
         reservations:
           cpus: '0.2'
           memory: 1G
-    environment:
-      - HOSTNAME=${HOSTNAME}
-      - SECRET_KEY=${SECRET_KEY}
-      - MORTY_KEY=${MORTY_KEY}
-
-  filtron:
-    image: ghcr.io/silkkycloud/filtron:latest
-    command: -target searx:8080
-    read_only: true
-    cap_drop:
-      - ALL
-    hostname: filtron
-    networks:
-      - public
-      - backend
-    deploy:
-      mode: replicated
-      replicas: 3
-      placement:
-        max_replicas_per_node: 1
-        constraints:
-          - "node.labels.web_server == true"
-      resources:
-        limits:
-          cpus: '2'
-          memory: 1G
-        reservations:
-          cpus: '0.1'
-          memory: 100M
       labels:
         - "traefik.enable=true"
-        # Router
+        # Searx Router
         - "traefik.http.routers.searx.rule=Host(`${HOSTNAME}`)"
         - "traefik.http.routers.searx.entrypoints=websecure"
         - "traefik.http.routers.searx.tls=true"
         - "traefik.http.routers.searx.middlewares=searx-global-headers,searx-headers"
-        - "traefik.http.routers.searx.service=filtron-service"
+        - "traefik.http.routers.searx.service=searx-service"
         # API Router
         - "traefik.http.routers.searx-api.rule=Host(`${HOSTNAME}`) && PathPrefix(`/config`, `/status`)"
         - "traefik.http.routers.searx-api.entrypoints=websecure"
         - "traefik.http.routers.searx-api.tls=true"
         - "traefik.http.routers.searx-api.middlewares=searx-global-headers,searx-api-headers"
-        - "traefik.http.routers.searx-api.service=filtron-service"
+        - "traefik.http.routers.searx-api.service=searx-service"
         # Static Router
         - "traefik.http.routers.searx-static.rule=Host(`${HOSTNAME}`) && PathPrefix(`/static`)"
         - "traefik.http.routers.searx-static.entrypoints=websecure"
         - "traefik.http.routers.searx-static.tls=true"
         - "traefik.http.routers.searx-static.middlewares=searx-global-headers,searx-static-headers"
-        - "traefik.http.routers.searx-static.service=filtron-service"
+        - "traefik.http.routers.searx-static.service=searx-service"
+        # Image Proxy Router
+        - "traefik.http.routers.searx-image-proxy.rule=Host(`${HOSTNAME}`) && PathPrefix(`/image_proxy`)"
+        - "traefik.http.routers.searx-image-proxy.entrypoints=websecure"
+        - "traefik.http.routers.searx-image-proxy.tls=true"
+        - "traefik.http.routers.searx-image-proxy.middlewares=searx-image-proxy-headers"
+        - "traefik.http.routers.searx-image-proxy.service=searx-service"
+        # Global Headers
+        - "traefik.http.middlewares.searx-global-headers.headers.frameDeny=true"
+        - "traefik.http.middlewares.searx-global-headers.headers.contentSecurityPolicy=upgrade-insecure-requests; default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; form-action 'self'; font-src 'self'; frame-ancestors 'self'; base-uri 'self'; connect-src 'self' https://overpass-api.de; img-src 'self' data: https://*.tile.openstreetmap.org; frame-src https://www.youtube-nocookie.com https://player.vimeo.com https://www.dailymotion.com https://www.deezer.com https://www.mixcloud.com https://w.soundcloud.com https://embed.spotify.com"
+        - "traefik.http.middlewares.searx-global-headers.headers.customResponseHeaders.X-Robots-Tag=noindex, noarchive, nofollow"
+        # Searx Headers
+        - "traefik.http.middlewares.searx-headers.headers.customResponseHeaders.Cache-Control=no-cache, no-store"
+        - "traefik.http.middlewares.searx-headers.headers.customResponseHeaders.Pragma=no-cache"
         # API Headers
         - "traefik.http.middlewares.searx-api-headers.headers.accessControlAllowOriginList=*"
         - "traefik.http.middlewares.searx-api-headers.headers.accessControlAllowMethods=GET, OPTIONS"
         # Static Headers
         - "traefik.http.middlewares.searx-static-headers.headers.customResponseHeaders.Cache-Control=public, max-age=31536000"
-        # Searx Headers
-        - "traefik.http.middlewares.searx-headers.headers.customResponseHeaders.Cache-Control=no-cache, no-store"
-        - "traefik.http.middlewares.searx-headers.headers.customResponseHeaders.Pragma=no-cache"
-        # Global Headers
-        - "traefik.http.middlewares.searx-global-headers.headers.frameDeny=true"
-        - "traefik.http.middlewares.searx-global-headers.headers.referrerPolicy=no-referrer"
-        - "traefik.http.middlewares.searx-global-headers.headers.contentSecurityPolicy=upgrade-insecure-requests; default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; form-action 'self'; font-src 'self'; frame-ancestors 'self'; base-uri 'self'; connect-src 'self' https://overpass-api.de; img-src 'self' data: https://*.tile.openstreetmap.org; frame-src https://www.youtube-nocookie.com https://player.vimeo.com https://www.dailymotion.com https://www.deezer.com https://www.mixcloud.com https://w.soundcloud.com https://embed.spotify.com"
-        - "traefik.http.middlewares.searx-global-headers.headers.customResponseHeaders.X-Robots-Tag=noindex, noarchive, nofollow"
+        # Image Proxy Headers
+        - "traefik.http.middlewares.searx-image-proxy-headers.headers.contentSecurityPolicy=default-src 'none'; img-src 'self' data:"
         # Service
-        - "traefik.http.services.filtron-service.loadbalancer.server.port=4040"
-
-  morty:
-    image: ghcr.io/silkkycloud/morty:latest
-    command: -timeout 6 -ipv6
-    read_only: true
-    cap_drop:
-      - ALL
-    hostname: morty
-    networks:
-      - public
-    deploy:
-      mode: replicated
-      replicas: 3
-      placement:
-        max_replicas_per_node: 1
-        constraints:
-          - "node.labels.proxy == true"
-      resources:
-        limits:
-          cpus: '1'
-          memory: 1G
-        reservations:
-          cpus: '0.01'
-          memory: 50M
-      labels:
-        - "traefik.enable=true"
-        # Router
-        - "traefik.http.routers.morty.rule=Host(`${HOSTNAME}`) && PathPrefix(`/morty`)"
-        - "traefik.http.routers.morty.entrypoints=websecure"
-        - "traefik.http.routers.morty.tls=true"
-        - "traefik.http.routers.morty.middlewares=morty-headers"
-        - "traefik.http.routers.morty.service=morty-service"
-        # Middleware
-        - "traefik.http.middlewares.morty-headers.headers.contentSecurityPolicy=default-src 'none'; style-src 'self' 'unsafe-inline'; form-action 'self'; frame-ancestors 'self'; base-uri 'self'; img-src 'self' data:; font-src 'self'; frame-src 'self'"
-        # Service
-        - "traefik.http.services.morty-service.loadbalancer.server.port=3000"
+        - "traefik.http.services.searx-service.loadbalancer.server.port=8080"
+        - "traefik.http.services.searx-service.loadbalancer.sticky.cookie=true"
+        - "traefik.http.services.searx-service.loadbalancer.sticky.cookie.secure=true"
+        - "traefik.http.services.searx-service.loadbalancer.sticky.cookie.samesite=strict"
     environment:
-      - MORTY_KEY=${MORTY_KEY}
-      - MORTY_ADDRESS=0.0.0.0:3000
+      - HOSTNAME=${HOSTNAME}
+      - SECRET_KEY=${SECRET_KEY}
 
   redis:
     image: redis:6.2.6-alpine

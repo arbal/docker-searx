@@ -18,16 +18,8 @@ else
   exit 1;
 fi
 
-if [[ -v MORTY_KEY ]]; then
-  sed -i "s@ENV_MORTY_KEY@$MORTY_KEY@g" /data/settings.yml
-else
-  echo "No morty key!"
-  exit 1;
-fi
-
 sleep 2s
 
 unset SECRET_KEY
-unset MORTY_KEY
 
 exec uwsgi --master --http-socket "0.0.0.0:8080" "/data/uwsgi.ini"
