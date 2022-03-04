@@ -80,6 +80,11 @@ services:
     environment:
       - HOSTNAME=${HOSTNAME}
       - SECRET_KEY=${SECRET_KEY}
+    configs:
+      - source: searx-config
+        target: /data/settings.yml
+        uid: "1000"
+        gid: "1000"
 
   redis:
     image: redis:6.2.6-alpine
@@ -112,3 +117,7 @@ networks:
     driver_opts:
       encrypted: "true"
       com.docker.network.driver.mtu: 1450
+
+configs:
+  searx-config:
+    file: ./searx/settings.yml
