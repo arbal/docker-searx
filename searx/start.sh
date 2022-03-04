@@ -27,4 +27,7 @@ fi
 
 sleep 2s
 
+unset SECRET_KEY
+unset MORTY_KEY
+
 exec uwsgi --master --http-socket "0.0.0.0:8080" "/data/uwsgi.ini"

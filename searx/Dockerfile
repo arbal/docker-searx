@@ -37,6 +37,7 @@ WORKDIR /searxng
 RUN pip3 install --upgrade pip wheel setuptools \
     && pip3 install --no-cache -r requirements.txt \
     && python3 -c "import six; import searx.version; six.print_(searx.version.VERSION_STRING)" > VERSION \
+    && python3 -m searx.version freeze \
     && apk del build-dependencies \
     && rm -rf /root/.cache
 
