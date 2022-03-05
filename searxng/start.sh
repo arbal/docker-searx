@@ -22,4 +22,4 @@ sleep 2s
 
 unset SECRET_KEY
 
-exec uwsgi --master --http-socket "0.0.0.0:8080" "/data/uwsgi.ini"
+exec uwsgi --master --http-socket "0.0.0.0:8080" "/config/uwsgi.ini"
